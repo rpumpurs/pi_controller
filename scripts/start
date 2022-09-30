@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Start Pi Controller
+
+#if [[ $UID != 0 ]]; then
+#    echo "Pi Controller must be started as root"
+#    echo "Please re-run this script as"
+#    echo "  sudo ./scripts/start"
+#    exit 1
+#fi
+
+check_dependencies () {
+  for cmd in "$@"; do
+    if ! command -v $cmd >/dev/null 2>&1; then
+      echo "This script requires \"${cmd}\" to be installed"
+      exit 1
+    fi
+  done
+}
+
+# Check system's dependencies
+check_dependencies readlink dirname ip
+
+# Check karen's dependencies
+check_dependencies fswatch
+
+# Check OTA update scripts' dependencies
+check_dependencies rsync jq curl
+
+# Check API V1 manager dependencies
+check_dependencies yarn node nohup
+
+PROJECT_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+PROJECT_LOGS="${PROJECT_ROOT}/logs"
+
+echo
+echo "======================================"
+echo "============= STARTING ==============="
+echo "=========== PI CONTROLLER ============"
+echo "======================================"
+echo
+
+echo "Setting environment variables..."
+echo
+
+# Whitelist device IP, hostname and hidden service for CORS
+DEVICE_IP="$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')"
+DEVICE_HOSTNAME="$(hostname)"
+
+cd "$PROJECT_ROOT"
+
+echo "Starting karen..."
+echo
+./karen &>> "${PROJECT_LOGS}/karen.log" &
+
+echo "Starting status monitors..."
+pkill -f ./scripts/status-monitor || true
+./scripts/status-monitor memory 60 &>> "${PROJECT_LOGS}/status-monitor.log" &
+./scripts/status-monitor storage 60 &>> "${PROJECT_LOGS}/status-monitor.log" &
+./scripts/status-monitor temperature 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+./scripts/status-monitor uptime 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+./scripts/status-monitor audio-sinks 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+./scripts/status-monitor bluetooth-devices 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+
+echo "Starting API V1 manager..."
+yarn start
+
+echo "Pi Controller is now accessible at"
+echo "  http://${DEVICE_HOSTNAME}"
+echo "  http://${DEVICE_IP}"

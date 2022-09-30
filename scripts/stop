@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Stop Pi Controller
+
+#if [[ $UID != 0 ]]; then
+#    echo "Pi Controller must be stopped as root"
+#    echo "Please re-run this script as"
+#    echo "  sudo ./scripts/stop"
+#    exit 1
+#fi
+
+PROJECT_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+
+if [[ ! -d "$PROJECT_ROOT" ]]; then
+  echo "Root dir does not exist '$PROJECT_ROOT'"
+  exit 1
+fi
+
+cd "$PROJECT_ROOT"
+
+# TODO: Transition to pidfiles so we can reliably kill these processes
+echo "Killing background services"
+ps -Af \
+  | grep '\./karen\|\./scripts/status-monitor\|pi_controller/scripts\|fswatch\|yarn\|bin/www' \
+  | grep -v grep \
+  | awk '{print $2}' \
+  | xargs kill -9 2> /dev/null || true

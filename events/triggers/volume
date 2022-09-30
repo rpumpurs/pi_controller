@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+sink="$1"
+volume="$2"
+
+pactl set-sink-volume "$sink" "$volume%"

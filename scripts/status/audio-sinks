@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+json="{}"
+
+pactl -f json list sinks
