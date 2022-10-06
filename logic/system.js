@@ -1,15 +1,21 @@
 const constants = require('utils/const.js');
 const diskLogic = require("logic/disk.js");
 
-function listSinks() {
-    return diskLogic.readJsonFile(constants.SINKS_STATUS_FILE)
+function statusJson(name) {
+    // TODO validate name
+    return diskLogic.readJsonFile(constants.STATUS_DIR + name + '-status.json')
 }
 
-function changeVolume(sink, volume) {
-    return diskLogic.writeSignalFile(constants.VOLUME_SIGNAL_FILE, sink + ' ' + volume);
+function command(name, args) {
+    let argValues = [];
+    for (let i in args) {
+        argValues.push(args[i]);
+    }
+
+    return diskLogic.writeSignalFile(name, argValues.join(' '));
 }
 
 module.exports = {
-    listSinks,
-    changeVolume,
+    statusJson,
+    command,
 };

@@ -4,4 +4,12 @@ set -euo pipefail
 sink="$1"
 volume="$2"
 
+min_volume=0
+max_volume=100
+
+volume=$(( volume < max_volume ? volume : max_volume ))
+echo $volume
+volume=$(( volume > min_volume ? volume : min_volume ))
+echo $volume
+
 pactl set-sink-volume "$sink" "$volume%"
