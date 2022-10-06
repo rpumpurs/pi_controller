@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+
+sink="$1"
+mpg123 --loop -1 -a "$sink" ${PROJECT_ROOT}/media/white.mp3 >/dev/null 2>&1 &
