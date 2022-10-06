@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+command="$1"
+mac="$2"
+
+bluetoothctl "$command" "$mac"
