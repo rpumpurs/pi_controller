@@ -4,6 +4,7 @@ const absolutePath = path.resolve('./');
 module.exports = {
   SIGNAL_DIR: process.env.SIGNAL_DIR || absolutePath + '/events/signals',
   VOLUME_SIGNAL_FILE: process.env.VOLUME_SIGNAL_FILE || 'volume',
+  SINKS_STATUS_FILE: process.env.SINKS_STATUS_FILE || absolutePath + '/statuses/audio-sinks-status.json',
   STATUS_CODES: {
     ACCEPTED: 202,
     BAD_GATEWAY: 502,
