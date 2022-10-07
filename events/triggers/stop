@@ -3,8 +3,4 @@ set -euo pipefail
 
 sink="$1"
 
-ps -Af \
-  | grep mpg123 \
-  | grep "$sink" \
-  | awk '{print $2}' \
-  | xargs kill 2> /dev/null || true
+pgrep -f "mpg123.*${sink}" | xargs kill 2> /dev/null || true
