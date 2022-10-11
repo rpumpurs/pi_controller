@@ -11,8 +11,10 @@ const system = require('routes/v1/system.js');
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
 app.use('/ping', ping);
-app.use('/v1/system', system);
+app.use('/api/v1/system', system);
 
 app.use(errorHandleMiddleware);
 app.use((req, res) => {
