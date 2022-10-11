@@ -20,6 +20,18 @@ class DeviceService {
   stop(sinkName) {
     return http.get(`/v1/system/command?name=stop&sink=${sinkName}`);
   }
+
+  volume(sinkName, volume) {
+    return http.get(`/v1/system/command?name=volume&sink=${sinkName}&volume=${volume}`);
+  }
+
+  mute(sinkName) {
+    return http.get(`/v1/system/command?name=mute&sink=${sinkName}`);
+  }
+
+  unmute(sinkName) {
+    return http.get(`/v1/system/command?name=unmute&sink=${sinkName}`);
+  }
 }
 
 export default new DeviceService();

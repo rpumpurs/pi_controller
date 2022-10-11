@@ -34,6 +34,10 @@
         <div>
           <button class="btn btn-outline-secondary" type="button" @click="play">Play</button>
           <button class="btn btn-outline-secondary" type="button" @click="stop">Stop</button>
+          <button class="btn btn-outline-secondary" type="button" @click="volume(-5)">Volume -</button>
+          <button class="btn btn-outline-secondary" type="button" @click="volume(5)">Volume +</button>
+          <button class="btn btn-outline-secondary" type="button" @click="mute">Mute</button>
+          <button class="btn btn-outline-secondary" type="button" @click="unmute">Unmute</button>
         </div>
       </div>
     </div>
@@ -77,6 +81,39 @@ export default {
 
     stop() {
       DeviceService.stop(this.currentSink.name)
+          .then(response => {
+            console.log(response.data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+
+    volume(volume) {
+      let currentVolume = parseInt(this.currentSink.volume['front-left'].value_percent);
+      this.currentSink.volume['front-left'].value_percent = (currentVolume + volume) + '%';
+      this.currentSink.volume['front-right'].value_percent = (currentVolume + volume) + '%';
+      DeviceService.volume(this.currentSink.name, currentVolume + volume)
+          .then(response => {
+            console.log(response.data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+
+    mute() {
+      DeviceService.mute(this.currentSink.name)
+          .then(response => {
+            console.log(response.data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+
+    unmute() {
+      DeviceService.unmute(this.currentSink.name)
           .then(response => {
             console.log(response.data);
           })
