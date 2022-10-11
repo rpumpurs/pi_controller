@@ -31,10 +31,10 @@
         <div>
           <label><strong>Volume:</strong></label> Left: {{ currentSink.volume['front-left'].value_percent }} Right: {{ currentSink.volume['front-right'].value_percent }}
         </div>
-      </div>
-      <div v-else>
-        <br />
-        <p>Please click on a Sink...</p>
+        <div>
+          <button class="btn btn-outline-secondary" type="button" @click="play">Play</button>
+          <button class="btn btn-outline-secondary" type="button" @click="stop">Stop</button>
+        </div>
       </div>
     </div>
   </div>
@@ -58,6 +58,26 @@ export default {
       DeviceService.getAllSinks()
           .then(response => {
             this.sinks = response.data;
+            console.log(response.data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+
+    play() {
+      DeviceService.play(this.currentSink.name)
+          .then(response => {
+            console.log(response.data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+
+    stop() {
+      DeviceService.stop(this.currentSink.name)
+          .then(response => {
             console.log(response.data);
           })
           .catch(e => {
