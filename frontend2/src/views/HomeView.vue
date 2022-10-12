@@ -1,9 +1,13 @@
-<script setup>
-import TheWelcome from '../components/TheWelcome.vue'
-</script>
-
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <DeviceList/>
+  <SinkList/>
 </template>
+
+<script>
+import DeviceList from "@/components/DeviceList.vue";
+import SinkList from "@/components/SinkList.vue";
+export default {
+  name: "index",
+  components: {SinkList, DeviceList},
+};
+</script>
