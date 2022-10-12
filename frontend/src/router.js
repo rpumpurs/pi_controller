@@ -8,9 +8,8 @@ export default new Router({
   routes: [
     {
       path: "/",
-      alias: "/sinks",
-      name: "sinks",
-      component: () => import("./components/SinkList")
+      name: "index",
+      component: () => import("./components/Index"),
     },
   ]
 });
