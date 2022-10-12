@@ -11,7 +11,7 @@ const system = require('routes/v1/system.js');
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'frontend2/dist')));
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 app.use('/ping', ping);
 app.use('/api/v1/system', system);
