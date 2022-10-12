@@ -26,7 +26,7 @@ check_dependencies readlink dirname ip
 check_dependencies fswatch
 
 # Check OTA update scripts' dependencies
-check_dependencies rsync jq curl
+check_dependencies rsync jq curl tr
 
 # Check API V1 manager dependencies
 check_dependencies yarn node nohup

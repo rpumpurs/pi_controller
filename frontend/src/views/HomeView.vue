@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import DeviceList from "@/components/DeviceList.vue";
+import DeviceList from "@/components/BluetoothDeviceList.vue";
 import SinkList from "@/components/SinkList.vue";
 export default {
   name: "index",
