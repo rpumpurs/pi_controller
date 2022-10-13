@@ -1,9 +1,7 @@
-const constants = require('utils/const.js');
 const diskLogic = require("logic/disk.js");
 
 function statusJson(name) {
-    // TODO validate name
-    return diskLogic.readJsonFile(constants.STATUS_DIR + name + '-status.json')
+    return diskLogic.readJsonFile(name + '-status.json')
 }
 
 function command(name, args) {
