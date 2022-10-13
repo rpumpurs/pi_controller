@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-die () {
-    printf '%s\n' >&2 "$@"
-    exit 1
-}
+read -r -a args <<< "$1"
 
-[ "$#" -eq 2 ] || die "2 arguments required, $# provided"
-
-command="$1"
-mac="$2"
+command=${args[0]}
+mac=${args[1]}
 
 [[ "${command}" =~ ^[a-zA-Z]*$ ]] || die "Invalid command"
 

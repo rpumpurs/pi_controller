@@ -51,8 +51,8 @@ fswatch -0 --event=Created $signal_dir | while read -d "" event; do
 
   if test -x "$trigger"; then
     echo "karen is getting triggered!"
-    echi
-    "$trigger" $args &
+    echo "$trigger" "$args"
+    "$trigger" "$args" &
   else
     echo "No trigger found"
   fi

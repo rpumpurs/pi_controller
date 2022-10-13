@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-sink="$1"
-volume="$2"
+read -r -a args <<< "$1"
+
+sink=${args[0]}
+volume=${args[1]}
 
 min_volume=0
 max_volume=100
