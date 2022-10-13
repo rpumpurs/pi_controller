@@ -3,14 +3,7 @@ set -euo pipefail
 
 # Stop Pi Controller
 
-#if [[ $UID != 0 ]]; then
-#    echo "Pi Controller must be stopped as root"
-#    echo "Please re-run this script as"
-#    echo "  sudo ./scripts/stop"
-#    exit 1
-#fi
-
-PROJECT_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+PROJECT_ROOT="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 
 if [[ ! -d "$PROJECT_ROOT" ]]; then
   echo "Root dir does not exist '$PROJECT_ROOT'"
@@ -18,11 +11,13 @@ if [[ ! -d "$PROJECT_ROOT" ]]; then
 fi
 
 # remove stuck signals
+echo "Removing stuck signal files ..."
 cd "$PROJECT_ROOT/scripts/events/signals"
-rm -f *.signal
+rm -f ./*.signal
 
 # TODO: Transition to pidfiles so we can reliably kill these processes
-echo "Killing background services"
+echo "Killing background services ..."
+# shellcheck disable=SC2009
 ps -Af \
   | grep '\./karen\|\./scripts/status-monitor\|pi_controller/scripts\|fswatch\|yarn\|bin/www' \
   | grep -v grep \

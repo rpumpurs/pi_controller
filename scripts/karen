@@ -4,7 +4,8 @@
 # karen gets triggered a lot
 
 check_if_not_already_running() {
-  if ps ax | grep $0 | grep -v $$ | grep bash | grep -v grep
+  # shellcheck disable=SC2009
+  if ps ax | grep "$0" | grep -v $$ | grep bash | grep -v grep
   then
     echo "karen is already running"
     exit 1
@@ -13,7 +14,7 @@ check_if_not_already_running() {
 
 check_dependencies () {
   for cmd in "$@"; do
-    if ! command -v $cmd >/dev/null 2>&1; then
+    if ! command -v "$cmd" >/dev/null 2>&1; then
       echo "This script requires \"${cmd}\" to be installed"
       exit 1
     fi
@@ -25,9 +26,9 @@ check_if_not_already_running
 check_dependencies fswatch readlink dirname
 
 if [[ -n "$1" ]]; then
-  root_dir="$(readlink -f $1)"
+  root_dir="$(readlink -f "$1")"
 else
-  root_dir="$(dirname $(readlink -f ${BASH_SOURCE[0]}))/scripts/events"
+  root_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/events"
 fi
 signal_dir="$root_dir/signals"
 trigger_dir="$root_dir/triggers"
@@ -38,7 +39,7 @@ if [[ ! -d "$root_dir" ]]; then
 fi
 
 echo "karen is running in $root_dir"
-fswatch -0 --event=Created $signal_dir | while read -d "" event; do
+fswatch -0 --event=Created "$signal_dir" | while read -r -d "" event; do
 
   signal="${event#"$signal_dir"}"
   signal="${signal#"/"}"
@@ -57,5 +58,5 @@ fswatch -0 --event=Created $signal_dir | while read -d "" event; do
     echo "No trigger found"
   fi
 
-  rm $signal_dir/$signal
+  rm "$signal_dir/$signal"
 done

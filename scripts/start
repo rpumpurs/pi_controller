@@ -31,7 +31,7 @@ check_dependencies rsync jq curl tr
 # Check API V1 manager dependencies
 check_dependencies yarn node nohup
 
-PROJECT_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+PROJECT_ROOT="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 PROJECT_LOGS="${PROJECT_ROOT}/logs"
 
 echo
@@ -52,7 +52,7 @@ cd "$PROJECT_ROOT"
 
 echo "Starting karen..."
 echo
-./karen &>> "${PROJECT_LOGS}/karen.log" &
+./scripts/karen &>> "${PROJECT_LOGS}/karen.log" &
 
 echo "Starting status monitors..."
 pkill -f ./scripts/status-monitor || true

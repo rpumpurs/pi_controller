@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}"))"
+PROJECT_ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
 resource="${1}"
 interval="${2}"
 
 log () {
-  echo "$(date "+%Y-%m-%d %H:%M:%S") ${@}"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") $*"
 }
 
 log "Status monitor for \"${resource}\" running every ${interval} seconds!"
