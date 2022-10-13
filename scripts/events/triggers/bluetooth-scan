@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")"/../../..)"
+
+bluetoothctl --timeout 10 scan on >/dev/null
+
+"${PROJECT_ROOT}"/scripts/status/bluetooth-devices

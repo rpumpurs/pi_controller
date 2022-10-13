@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+PROJECT_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}"))"
 
 resource="${1}"
 interval="${2}"
@@ -11,7 +11,7 @@ log () {
 
 log "Status monitor for \"${resource}\" running every ${interval} seconds!"
 
-status_script="${PROJECT_ROOT}/scripts/status/${resource}"
+status_script="${PROJECT_ROOT}/status/${resource}"
 json_path="${PROJECT_ROOT}/statuses/${resource}-status.json"
 while true; do
   result=$("${status_script}")

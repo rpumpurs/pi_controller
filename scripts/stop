@@ -17,7 +17,9 @@ if [[ ! -d "$PROJECT_ROOT" ]]; then
   exit 1
 fi
 
-cd "$PROJECT_ROOT"
+# remove stuck signals
+cd "$PROJECT_ROOT/scripts/events/signals"
+rm -f *.signal
 
 # TODO: Transition to pidfiles so we can reliably kill these processes
 echo "Killing background services"

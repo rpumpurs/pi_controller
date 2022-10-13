@@ -44,10 +44,6 @@ class DeviceService {
   bluetoothScan() {
     return http.get(`/v1/system/command?name=bluetooth-scan`);
   }
-
-  getBluetoothScanResults() {
-    return http.get(`/v1/system/command?name=bluetooth-last-scan`);
-  }
 }
 
 export default new DeviceService();

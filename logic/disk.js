@@ -49,7 +49,7 @@ function writeSignalFile(signalFile, args) {
     throw new Error('Invalid signal file characters');
   }
 
-  const signalFilePath = path.join(constants.SIGNAL_DIR, signalFile);
+  const signalFilePath = path.join(constants.SIGNAL_DIR, signalFile + '.signal');
   return diskService.writeFile(signalFilePath, args);
 }
 

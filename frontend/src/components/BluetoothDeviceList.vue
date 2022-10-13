@@ -7,7 +7,7 @@
         </div>
         <div class="col-md-2">
           <template v-if="loading">
-            <img src="/images/loading.gif" height="38"  alt="loading"/>
+            <img src="/images/loading.gif" alt="loading"/>
           </template>
           <template v-else>
             <button class="btn btn-outline-secondary" type="button" @click="scan">Scan</button>
