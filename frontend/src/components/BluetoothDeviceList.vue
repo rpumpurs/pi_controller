@@ -1,9 +1,22 @@
 <template>
   <div class="list row">
     <div class="col-md-6">
-      <h4>Bluetooth Device List</h4>
+      <div class="list row">
+        <div class="col-md-10">
+          <h4>Bluetooth Device List</h4>
+        </div>
+        <div class="col-md-2">
+          <template v-if="loading">
+            <img src="/images/loading.gif" height="38"  alt="loading"/>
+          </template>
+          <template v-else>
+            <button class="btn btn-outline-secondary" type="button" @click="scan">Scan</button>
+          </template>
+        </div>
+      </div>
       <ul class="list-group">
         <li class="list-group-item"
+            :class="{ active: index === currentIndex }"
             v-for="(device, index) in devices"
             @click="setActiveDevice(device, index)"
         >
@@ -59,6 +72,7 @@ export default {
       devices: [],
       currentDevice: null,
       currentIndex: -1,
+      loading: false
     };
   },
   methods: {
@@ -66,6 +80,7 @@ export default {
       DeviceService.getBluetoothDevices()
           .then(response => {
             this.devices = response.data;
+
             console.log(response.data);
           })
           .catch(e => {
@@ -157,6 +172,20 @@ export default {
       DeviceService.bluetooth('remove', this.currentDevice.mac)
           .then(response => {
             console.log(response.data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+    },
+
+    scan() {
+      DeviceService.bluetoothScan()
+          .then(response => {
+            this.loading = true;
+            setTimeout(() => {
+              this.retrieveBluetoothDevices();
+              this.loading = false;
+            }, 10000);
           })
           .catch(e => {
             console.log(e);

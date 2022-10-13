@@ -4,7 +4,7 @@
       <h4>Sink List</h4>
       <ul class="list-group">
         <li class="list-group-item"
-          :class="{ active: index == currentIndex }"
+          :class="{ active: index === currentIndex }"
           v-for="(sink, index) in sinks"
           :key="index"
           @click="setActiveSink(sink, index)"
@@ -51,7 +51,7 @@ export default {
   name: "sink-list",
   data() {
     return {
-      sinks: [],
+      sinks: ['No sinks available'],
       currentSink: null,
       currentIndex: -1,
       title: ""
