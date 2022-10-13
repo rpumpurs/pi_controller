@@ -9,7 +9,7 @@ function handleError(error, req, res, next) {
 
   logger.error(message, route, error.stack);
 
-  res.status(statusCode).json(message);
+  res.status(statusCode).json("Something broke");
 }
 
 module.exports = handleError;
