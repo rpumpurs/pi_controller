@@ -2,8 +2,9 @@
 
 PROJECT_ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
-resource="${1}"
-interval="${2}"
+resource_path="${1}"
+resource="${2}"
+interval="${3}"
 
 log () {
   echo "$(date "+%Y-%m-%d %H:%M:%S") $*"
@@ -11,7 +12,7 @@ log () {
 
 log "Status monitor for \"${resource}\" running every ${interval} seconds!"
 
-status_script="${PROJECT_ROOT}/status/${resource}"
+status_script="${resource_path}/${resource}"
 json_path="${PROJECT_ROOT}/statuses/${resource}-status.json"
 while true; do
   result=$("${status_script}")

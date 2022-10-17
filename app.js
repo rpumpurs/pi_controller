@@ -1,5 +1,6 @@
 require('module-alias/register');
 require('module-alias').addPath('.');
+require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
@@ -11,7 +12,9 @@ const system = require('routes/v1/system.js');
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+console.log(process.env.FRONTEND_PATH);
+
+app.use(express.static(process.env.FRONTEND_PATH));
 
 app.use('/ping', ping);
 app.use('/api/v1/system', system);

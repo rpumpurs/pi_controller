@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-sink="$1"
-
-pgrep -f "mpg123.*${sink}" | xargs kill 2> /dev/null || true

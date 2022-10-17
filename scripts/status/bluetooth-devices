@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-bluetoothctl devices | cut -f2 -d' ' | while read -r uuid; do echo -n 'Mac: '; echo "$uuid" | tr ':' '$'; bluetoothctl info "$uuid"; done | grep -e "Mac\|Connected\|Paired\|Trusted\|Blocked\|Name" | tr -d '\t' | jq -sRc '[ split("\n[*]:[*] +\n";"n")[] | [ capture("(?<key>[^:\n]+):(?<value>[^:\n]+)";"g") | .key |= (. | ascii_downcase) | .value |= (. | ltrimstr(" "))] | from_entries ]' | tr '$' ':'

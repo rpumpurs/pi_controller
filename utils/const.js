@@ -1,8 +1,9 @@
 const path = require("path");
 const absolutePath = path.resolve('./');
+require('dotenv').config();
 
 module.exports = {
-  SIGNAL_DIR: process.env.SIGNAL_DIR || absolutePath + '/scripts/events/signals/',
+  SIGNAL_DIR: (process.env.EVENTS_PATH || absolutePath + '/scripts/events') + '/signals/',
   STATUS_DIR: process.env.STATUS_DIR || absolutePath + '/scripts/statuses/',
   STATUS_CODES: {
     ACCEPTED: 202,

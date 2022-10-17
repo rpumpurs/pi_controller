@@ -3,13 +3,6 @@ set -euo pipefail
 
 # Start Pi Controller
 
-#if [[ $UID != 0 ]]; then
-#    echo "Pi Controller must be started as root"
-#    echo "Please re-run this script as"
-#    echo "  sudo ./scripts/start"
-#    exit 1
-#fi
-
 check_dependencies () {
   for cmd in "$@"; do
     if ! command -v $cmd >/dev/null 2>&1; then
@@ -34,6 +27,12 @@ check_dependencies yarn node nohup
 PROJECT_ROOT="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 PROJECT_LOGS="${PROJECT_ROOT}/logs"
 
+#export $(grep -v '^#' "${PROJECT_ROOT}/".env | xargs)
+
+while IFS= read -r line; do
+  export "${line?}"
+done <"${PROJECT_ROOT}/".env
+
 echo
 echo "======================================"
 echo "============= STARTING ==============="
@@ -52,14 +51,16 @@ cd "$PROJECT_ROOT"
 
 echo "Starting karen..."
 echo
-./scripts/karen &>> "${PROJECT_LOGS}/karen.log" &
+./scripts/karen "${EVENTS_PATH}" &>> "${PROJECT_LOGS}/karen.log" &
 
 echo "Starting status monitors..."
-pkill -f ./scripts/status-monitor || true
-./scripts/status-monitor temperature 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
-./scripts/status-monitor uptime 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
-./scripts/status-monitor audio-sinks 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
-./scripts/status-monitor bluetooth-devices 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+pkill -f ./status-monitor || true
+./scripts/status-monitor "${PROJECT_ROOT}/scripts/status" temperature 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+./scripts/status-monitor "${PROJECT_ROOT}/scripts/status" uptime 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+
+for filename in "${STATUS_PATH}"/*; do
+  ./scripts/status-monitor "${STATUS_PATH}" "$(basename "$filename")" 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+done
 
 echo "Starting API V1 manager..."
 yarn start
