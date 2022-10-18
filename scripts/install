@@ -6,7 +6,7 @@ UPDATE_APT="true"
 INSTALL_APT_DEPS="true"
 INSTALL_START_SCRIPT="true"
 INSTALL_PI_CONTROLLER="true"
-PI_CONTROLLER_VERSION="release"
+PI_CONTROLLER_VERSION="main"
 PI_CONTROLLER_REPO="rpumpurs/pi_controller"
 PI_CONTROLLER_INSTALL_PATH="$HOME/pi_controller"
 
@@ -83,7 +83,7 @@ main() {
     echo "About to install Pi Controller in \"${PI_CONTROLLER_INSTALL_PATH}\"."
     echo "If you would like to install somewhere else you can specify a custom location with:"
     echo
-    echo "  curl -L https://raw.githubusercontent.com/${PI_CONTROLLER_REPO}/${version}/scripts/install | bash -s -- --install-path /some/path"
+    echo "  curl -L https://raw.githubusercontent.com/${PI_CONTROLLER_REPO}/${PI_CONTROLLER_VERSION}/scripts/install | bash -s -- --install-path /some/path"
     echo
     echo "Waiting for 10 seconds..."
     echo
@@ -100,7 +100,7 @@ main() {
       echo "Error: Pi Controller install path \"${PI_CONTROLLER_INSTALL_PATH}\" already contains files"
       echo "You can install Pi Controller in a custom location with:"
       echo
-      echo "  curl -L https://raw.githubusercontent.com/${PI_CONTROLLER_REPO}/${version}/scripts/install | bash -s -- --install-path /some/path"
+      echo "  curl -L https://raw.githubusercontent.com/${PI_CONTROLLER_REPO}/${PI_CONTROLLER_VERSION}/scripts/install | bash -s -- --install-path /some/path"
       exit 1
     fi
   fi
