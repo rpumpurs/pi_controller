@@ -105,6 +105,7 @@ TimeoutStartSec=infinity
 TimeoutStopSec=16min
 ExecStart=${PI_CONTROLLER_INSTALL_PATH}/scripts/start
 ExecStop=${PI_CONTROLLER_INSTALL_PATH}/scripts/stop
+User=${USER}
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=pi controller startup
