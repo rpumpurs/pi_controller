@@ -12,6 +12,12 @@ check_dependencies () {
   done
 }
 
+center() {
+  termwidth="38"
+  padding="$(printf '%0.1s' ={1..500})"
+  printf '%*.*s %s %*.*s\n' 0 "$(((termwidth-2-${#1})/2))" "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
+}
+
 # Check system's dependencies
 check_dependencies readlink dirname ip
 
@@ -27,17 +33,30 @@ check_dependencies yarn node nohup
 PROJECT_ROOT="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 PROJECT_LOGS="${PROJECT_ROOT}/logs"
 
-#export $(grep -v '^#' "${PROJECT_ROOT}/".env | xargs)
-
-while IFS= read -r line; do
-  export "${line?}"
-done <"${PROJECT_ROOT}/".env
+# Detect custom app
+APP_PATH=""
+APP_VERSION=""
+APP_NAME=""
+folders=(app/*)
+if [ -d "${folders[0]}" ]; then
+  APP_PATH="${folders[0]}"
+  APP_VERSION=$(jq -r '.version' "${APP_PATH}/info.json")
+  APP_NAME=$(jq -r '.name' "${APP_PATH}/info.json")
+fi
 
 echo
 echo "======================================"
-echo "============= STARTING ==============="
-echo "=========== PI CONTROLLER ============"
+center "STARTING"
+center "PI CONTROLLER"
 echo "======================================"
+
+if [[ -n "$APP_PATH" ]]; then
+  echo "======================================"
+  center "LOADED APP"
+  center "${APP_NAME}"
+  center "${APP_VERSION}"
+  echo "======================================"
+fi
 echo
 
 echo "Setting environment variables..."
@@ -51,16 +70,18 @@ cd "$PROJECT_ROOT"
 
 echo "Starting karen..."
 echo
-./scripts/karen "${EVENTS_PATH}" &>> "${PROJECT_LOGS}/karen.log" &
+./scripts/karen "${APP_PATH}"/events &>> "${PROJECT_LOGS}/karen.log" &
 
 echo "Starting status monitors..."
 pkill -f ./status-monitor || true
 ./scripts/status-monitor "${PROJECT_ROOT}/scripts/status" temperature 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
 ./scripts/status-monitor "${PROJECT_ROOT}/scripts/status" uptime 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
 
-for filename in "${STATUS_PATH}"/*; do
-  ./scripts/status-monitor "${STATUS_PATH}" "$(basename "$filename")" 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
-done
+if [[ -n "$APP_PATH" ]]; then
+  for filename in "${APP_PATH}"/status/*; do
+    ./scripts/status-monitor "${APP_PATH}"/status "$(basename "$filename")" 15 &>> "${PROJECT_LOGS}/status-monitor.log" &
+  done
+fi
 
 echo "Starting API V1 manager..."
 yarn start

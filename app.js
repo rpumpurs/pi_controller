@@ -1,9 +1,7 @@
 require('module-alias/register');
 require('module-alias').addPath('.');
-require('dotenv').config();
-
 const express = require('express');
-const path = require('path');
+const appResolver = require('utils/appResolver.js');
 
 const errorHandleMiddleware = require('middlewares/errorHandling.js');
 
@@ -12,9 +10,9 @@ const system = require('routes/v1/system.js');
 
 const app = express();
 
-console.log(process.env.FRONTEND_PATH);
-
-app.use(express.static(process.env.FRONTEND_PATH));
+if (appResolver.APP_FRONTEND_PATH) {
+  app.use(express.static(appResolver.APP_FRONTEND_PATH));
+}
 
 app.use('/ping', ping);
 app.use('/api/v1/system', system);
