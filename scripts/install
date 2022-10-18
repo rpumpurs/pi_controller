@@ -13,6 +13,12 @@ PI_CONTROLLER_INSTALL_PATH="$HOME/pi_controller"
 # Parse arguments
 arguments=${@:-}
 
+if [[ "${arguments}" = *"--no-install-deps"* ]]
+then
+  UPDATE_APT="false"
+  INSTALL_APT_DEPS="false"
+fi
+
 if [[ "${arguments}" = *"--version"* ]]
 then
   PI_CONTROLLER_VERSION="$(echo "${arguments}" | sed 's/.*--version \([^ ]*\).*/\1/')"
