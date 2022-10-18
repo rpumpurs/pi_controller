@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Default options
+UPDATE_APT="true"
+INSTALL_APT_DEPS="true"
+INSTALL_START_SCRIPT="true"
+INSTALL_PI_CONTROLLER="true"
+PI_CONTROLLER_VERSION="release"
+PI_CONTROLLER_REPO="rpumpurs/pi_controller"
+PI_CONTROLLER_INSTALL_PATH="$HOME/pi_controller"
+
+# Parse arguments
+arguments=${@:-}
+
+if [[ "${arguments}" = *"--version"* ]]
+then
+  PI_CONTROLLER_VERSION="$(echo "${arguments}" | sed 's/.*--version \([^ ]*\).*/\1/')"
+fi
+
+if [[ "${arguments}" = *"--install-path"* ]]
+then
+  PI_CONTROLLER_INSTALL_PATH="$(echo "${arguments}" | sed 's/.*--install-path \([^ ]*\).*/\1/')"
+fi
+
+get_pi_controller_version() {
+  version="${PI_CONTROLLER_VERSION}"
+  if [[ "${version}" = "release" ]]
+  then
+    version=$(curl --silent https://api.github.com/repos/${PI_CONTROLLER_REPO}/releases/latest | sed -n 's/.*"tag_name": "\([^"]*\).*/\1/p')
+  fi
+
+  echo "$version"
+}
+
+update_apt() {
+  sudo apt-get update --yes
+}
+
+install_apt_deps() {
+  sudo apt-get install --yes fswatch jq rsync curl git gettext-base python3 gnupg
+}
+
+
+install_pi_controller() {
+  version=$(get_pi_controller_version)
+  curl --location "https://api.github.com/repos/${PI_CONTROLLER_REPO}/tarball/${version}" | \
+    tar --extract --gzip --strip-components=1 --directory="${PI_CONTROLLER_INSTALL_PATH}"
+}
+
+install_systemd_service() {
+echo "
+[Unit]
+Wants=network-online.target
+After=network-online.target
+
+# This prevents us hitting restart rate limits and ensures we keep restarting
+# indefinitely.
+StartLimitInterval=0
+
+[Service]
+Type=forking
+TimeoutStartSec=infinity
+TimeoutStopSec=16min
+ExecStart=${PI_CONTROLLER_INSTALL_PATH}/scripts/start
+ExecStop=${PI_CONTROLLER_INSTALL_PATH}/scripts/stop
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=pi controller startup
+RemainAfterExit=yes
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/pi-controller-startup.service"
+  sudo chmod 644 "/etc/systemd/system/pi-controller-startup.service"
+  sudo systemctl enable "pi-controller-startup.service"
+}
+
+main() {
+  if [[ "${INSTALL_PI_CONTROLLER}" = "true" ]]
+  then
+    echo "About to install Pi Controller in \"${PI_CONTROLLER_INSTALL_PATH}\"."
+    echo "If you would like to install somewhere else you can specify a custom location with:"
+    echo
+    echo "  curl -L https://raw.githubusercontent.com/${PI_CONTROLLER_REPO}/${version}/scripts/install | bash -s -- --install-path /some/path"
+    echo
+    echo "Waiting for 10 seconds..."
+    echo
+    echo "You may press Ctrl+C now to abort the install."
+    echo
+    sleep 10
+  fi
+
+  if [[ "${INSTALL_PI_CONTROLLER}" = "true" ]]
+  then
+    mkdir -p "${PI_CONTROLLER_INSTALL_PATH}"
+    if [[ "$(ls --almost-all "${PI_CONTROLLER_INSTALL_PATH}")" ]]
+    then
+      echo "Error: Pi Controller install path \"${PI_CONTROLLER_INSTALL_PATH}\" already contains files"
+      echo "You can install Pi Controller in a custom location with:"
+      echo
+      echo "  curl -L https://raw.githubusercontent.com/${PI_CONTROLLER_REPO}/${version}/scripts/install | bash -s -- --install-path /some/path"
+      exit 1
+    fi
+  fi
+
+  if [[ "${UPDATE_APT}" = "true" ]]
+  then
+    update_apt
+  fi
+
+  if [[ "${INSTALL_APT_DEPS}" = "true" ]]
+  then
+    install_apt_deps
+  fi
+
+  if [[ "${INSTALL_PI_CONTROLLER}" = "true" ]]
+  then
+    install_pi_controller
+
+    if [[ "${INSTALL_START_SCRIPT}" = "true" ]]
+    then
+      install_systemd_service
+    fi
+
+    # Do the initial start outside of systemd so we get logs
+    sudo "${PI_CONTROLLER_INSTALL_PATH}"/scripts/start
+
+    if [[ "${INSTALL_START_SCRIPT}" = "true" ]]
+    then
+      # Kick off the systemd service again so it's in sync
+      sudo systemctl start "pi-controller-startup.service"
+    fi
+
+  echo
+  echo "Pi Controller has been successfully installed!"
+  fi
+}
+
+main
