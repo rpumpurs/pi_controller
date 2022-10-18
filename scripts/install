@@ -9,6 +9,9 @@ INSTALL_PI_CONTROLLER="true"
 PI_CONTROLLER_VERSION="main"
 PI_CONTROLLER_REPO="rpumpurs/pi_controller"
 PI_CONTROLLER_INSTALL_PATH="$HOME/pi_controller"
+APP_NAME=""
+APP_REPO=""
+APP_VERSION="main"
 
 # Parse arguments
 arguments=${@:-}
@@ -29,11 +32,31 @@ then
   PI_CONTROLLER_INSTALL_PATH="$(echo "${arguments}" | sed 's/.*--install-path \([^ ]*\).*/\1/')"
 fi
 
+if [[ "${arguments}" = *"--app-name"* ]]
+then
+  APP_NAME="$(echo "${arguments}" | sed 's/.*--app-name \([^ ]*\).*/\1/')"
+fi
+
+if [[ "${arguments}" = *"--app-repo"* ]]
+then
+  APP_REPO="$(echo "${arguments}" | sed 's/.*--app-repo \([^ ]*\).*/\1/')"
+fi
+
 get_pi_controller_version() {
   version="${PI_CONTROLLER_VERSION}"
   if [[ "${version}" = "release" ]]
   then
     version=$(curl --silent https://api.github.com/repos/${PI_CONTROLLER_REPO}/releases/latest | sed -n 's/.*"tag_name": "\([^"]*\).*/\1/p')
+  fi
+
+  echo "$version"
+}
+
+get_app_version() {
+  version="${APP_VERSION}"
+  if [[ "${version}" = "release" ]]
+  then
+    version=$(curl --silent https://api.github.com/repos/${APP_REPO}/releases/latest | sed -n 's/.*"tag_name": "\([^"]*\).*/\1/p')
   fi
 
   echo "$version"
@@ -52,6 +75,18 @@ install_pi_controller() {
   version=$(get_pi_controller_version)
   curl --location "https://api.github.com/repos/${PI_CONTROLLER_REPO}/tarball/${version}" | \
     tar --extract --gzip --strip-components=1 --directory="${PI_CONTROLLER_INSTALL_PATH}"
+
+  yarn install --cwd ${PI_CONTROLLER_INSTALL_PATH}
+}
+
+install_app() {
+  version=$(get_app_version)
+  mkdir "${PI_CONTROLLER_INSTALL_PATH}/app/${APP_NAME}"
+  curl --location "https://api.github.com/repos/${APP_REPO}/tarball/${version}" | \
+    tar --extract --gzip --strip-components=1 --directory="${PI_CONTROLLER_INSTALL_PATH}/app/${APP_NAME}"
+
+  APP_INSTALL_SCRIPT=$(jq -r '.install_script' "${PI_CONTROLLER_INSTALL_PATH}/app/${APP_NAME}/info.json")
+  cd "${PI_CONTROLLER_INSTALL_PATH}/app/${APP_NAME}" && bash -c "${APP_INSTALL_SCRIPT}"
 }
 
 install_systemd_service() {
@@ -124,6 +159,7 @@ main() {
   if [[ "${INSTALL_PI_CONTROLLER}" = "true" ]]
   then
     install_pi_controller
+    install_app
 
     if [[ "${INSTALL_START_SCRIPT}" = "true" ]]
     then
@@ -131,7 +167,7 @@ main() {
     fi
 
     # Do the initial start outside of systemd so we get logs
-    sudo "${PI_CONTROLLER_INSTALL_PATH}"/scripts/start
+    "${PI_CONTROLLER_INSTALL_PATH}"/scripts/start
 
     if [[ "${INSTALL_START_SCRIPT}" = "true" ]]
     then
