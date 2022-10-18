@@ -105,7 +105,6 @@ TimeoutStartSec=infinity
 TimeoutStopSec=16min
 ExecStart=${PI_CONTROLLER_INSTALL_PATH}/scripts/start
 ExecStop=${PI_CONTROLLER_INSTALL_PATH}/scripts/stop
-User=${USER}
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=pi controller startup
@@ -114,9 +113,9 @@ Restart=always
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target" | sudo tee "/etc/systemd/system/pi-controller-startup.service"
-  sudo chmod 644 "/etc/systemd/system/pi-controller-startup.service"
-  sudo systemctl enable "pi-controller-startup.service"
+WantedBy=default.target" | sudo tee "/etc/systemd/user/pi-controller-startup.service"
+  sudo chmod 644 "/etc/systemd/user/pi-controller-startup.service"
+  systemctl enable --user "pi-controller-startup.service"
 }
 
 main() {
@@ -173,7 +172,7 @@ main() {
     if [[ "${INSTALL_START_SCRIPT}" = "true" ]]
     then
       # Kick off the systemd service again so it's in sync
-      sudo systemctl start "pi-controller-startup.service"
+      systemctl start --user "pi-controller-startup.service"
     fi
 
   echo
