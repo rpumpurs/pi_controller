@@ -70,7 +70,8 @@ install_apt_deps() {
   sudo apt-get install --yes fswatch jq rsync curl git gettext-base python3 gnupg
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  sudo apt install --no-install-recommends -y yarn
+  sudo apt-get update
+  sudo apt-get install --no-install-recommends -y yarn
 }
 
 
@@ -79,7 +80,7 @@ install_pi_controller() {
   curl --location "https://api.github.com/repos/${PI_CONTROLLER_REPO}/tarball/${version}" | \
     tar --extract --gzip --strip-components=1 --directory="${PI_CONTROLLER_INSTALL_PATH}"
 
-  yarn install --cwd ${PI_CONTROLLER_INSTALL_PATH}
+  yarn install --cwd "${PI_CONTROLLER_INSTALL_PATH}"
 }
 
 install_app() {
